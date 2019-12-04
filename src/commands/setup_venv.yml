@@ -1,0 +1,17 @@
+description: >
+  This command will setup virtual env
+
+steps:
+  - checkout
+  - run:
+      name: Install and activate virtual environment
+      command: |
+        if [ ! -d "venv" ]; then
+          pip install virtualenv
+          virtualenv venv
+        fi
+  - save_cache:
+      key: python-sources-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - .
+        - ~/.ssh

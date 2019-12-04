@@ -1,0 +1,25 @@
+executor: python
+parameters:
+  push_gemfury:
+    description: Decide whether to push to gemfury or not
+    type: boolean
+    default: false
+  from_local:
+    description: Decide whether install python versioner from local or gemfury
+    type: boolean
+    default: false
+steps:
+  - setup_venv
+  - when:
+      condition: <<parameters.from_local>>
+      steps:
+        - install_local_python_versioner
+  - unless:
+      condition: <<parameters.from_local>>
+      steps:
+        - install_gemfury_python_versioner
+  - increment_and_tag
+  - when:
+      condition: <<parameters.push_gemfury>>
+      steps:
+        - upload_to_gemfury

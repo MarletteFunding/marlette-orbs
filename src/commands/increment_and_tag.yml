@@ -1,0 +1,29 @@
+description: >
+  This command will use the python versioner and increment and tag the repo
+
+steps:
+  - restore_cache:
+      keys:
+        - python-sources-{{ .Branch }}-{{ .Revision }}
+  - run:
+      name: Increment version
+      command: |
+        . venv/bin/activate
+        gitlog=$(git log -1 --format=oneline)
+        if [[ "$gitlog" ==  *hotfix*  ]]; then increment_revision;
+        elif [[ "$gitlog" ==  *major*  ]]; then increment_major;
+        else increment_minor; fi
+  - run:
+      name: Tag and Push source to GitHub
+      command: |
+        . venv/bin/activate
+        git tag $(print_version) $CIRCLE_SHA1
+        git push --tags
+        git add .
+        git -c user.name=CircleCi -c user.email=circleci@marlettefunding.com commit -m "Increment version for next release [skip ci]"
+        git push
+  - save_cache:
+      key: python-sources-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - .
+        - ~/.ssh
