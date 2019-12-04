@@ -14,8 +14,8 @@ workflows:
       # lint your destructured orb YAML files
       - orb-tools/lint
 
-      # pack your orb YAML files to a single orb.yml
-      # validate the orb.yml file to ensure it is well-formed
+      # pack your orb YAML files to a single @orb.yml
+      # validate the @orb.yml file to ensure it is well-formed
       - orb-tools/pack:
           requires:
             - orb-tools/lint
