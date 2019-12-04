@@ -1,0 +1,33 @@
+description: >
+  This command will install a local version of python_versioner
+
+parameters:
+  from_local:
+    description: Decide whether to push to use local or not
+    type: boolean
+    default: false
+steps:
+  - restore_cache:
+      keys:
+        - python-sources-{{ .Branch }}-{{ .Revision }}
+  - when:
+      condition: <<parameters.from_local>>
+      steps:
+        - run:
+            name: Install local python versioner
+            command: |
+              . venv/bin/activate
+              pip install -e .
+  - unless:
+      condition: <<parameters.from_local>>
+      steps:
+        - run:
+            name: Install remote python versioner
+            command: |
+              . venv/bin/activate
+              pip install python-versioner --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
+  - save_cache:
+      key: python-sources-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - .
+        - ~/.ssh

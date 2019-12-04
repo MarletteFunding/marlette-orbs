@@ -10,16 +10,7 @@ parameters:
     default: false
 steps:
   - setup_venv
-  - when:
-      condition: <<parameters.from_local>>
-      steps:
-        - install_local_python_versioner
-  - unless:
-      condition: <<parameters.from_local>>
-      steps:
-        - install_gemfury_python_versioner
-  - increment_and_tag
-  - when:
-      condition: <<parameters.push_gemfury>>
-      steps:
-        - upload_to_gemfury
+  - install_python_versioner:
+      from_local: <<parameters.from_local>>
+  - increment_and_tag:
+      push_gemfury: <<parameters.push_gemfury>>

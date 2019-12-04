@@ -1,6 +1,11 @@
 description: >
   This command will use the python versioner and increment and tag the repo
 
+parameters:
+  push_gemfury:
+    description: Decide whether to push to gemfury or not
+    type: boolean
+    default: false
 steps:
   - restore_cache:
       keys:
@@ -22,6 +27,15 @@ steps:
         git add .
         git -c user.name=CircleCi -c user.email=circleci@marlettefunding.com commit -m "Increment version for next release [skip ci]"
         git push
+  - when:
+      condition: <<parameters.push_gemfury>>
+      steps:
+          - run:
+              name: Upload distribution to Gemfury
+              command: |
+                . venv/bin/activate
+                python setup.py bdist_wheel
+                sh bin/deploy.sh
   - save_cache:
       key: python-sources-{{ .Branch }}-{{ .Revision }}
       paths:
