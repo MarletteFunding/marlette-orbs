@@ -5,10 +5,16 @@ description: >
 usage:
   version: 2.1
   orbs:
-    foo: bar/foo@1.2.3
+    marlette-orbs: marlette-funding/marlette-orbs@0.6.0
   jobs:
     build:
-      machine: true
+      executor: python
       steps:
-        - foo/hello:
-            username: "Anna"
+        - marlette-orbs/version_python:
+            push_gemfury: false
+            from_local: false
+            requires:
+              - pytest
+            filters:
+              branches:
+                only: master
