@@ -6,7 +6,7 @@ docker:
   - image: 'circleci/python:<<parameters.tag>>'
 parameters:
   tag:
-    default: 2.7.13
+    default: 3.8.0
     description: >
       Pick a specific python version
     type: string
