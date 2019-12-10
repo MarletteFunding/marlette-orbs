@@ -9,7 +9,7 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - python-sources-{{ .Branch }}-{{ .Revision }}
+        - python-versioner-{{ .Branch }}-{{ .Revision }}
   - run:
       name: Increment version
       command: |
