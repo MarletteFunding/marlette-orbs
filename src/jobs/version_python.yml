@@ -8,9 +8,63 @@ parameters:
     description: Decide whether install python versioner from local or gemfury
     type: boolean
     default: false
+  wd:
+    description: working directory
+    type: string
+    default: ~/circleci/workspace
+  python_versioner_version:
+    description: version of python versioner
+    type: string
+    default: 0.12.0
+working_directory: <<parameters.wd>>
 steps:
-  - setup_venv
-  - install_python_versioner:
-      from_local: <<parameters.from_local>>
-  - increment_and_tag:
-      push_gemfury: <<parameters.push_gemfury>>
+  - setup_venv:
+      install_requirements: false
+  - restore_cache:
+      keys:
+        - python-orb-{{ .Branch }}-{{ .Revision }}
+  - when:
+      condition: <<parameters.from_local>>
+      steps:
+        - run:
+            name: Install local python versioner
+            command: |
+              . venv/bin/activate
+              pip install -e .
+  - unless:
+      condition: <<parameters.from_local>>
+      steps:
+        - run:
+            name: Install remote python versioner
+            command: |
+              . venv/bin/activate
+              pip install python-versioner=<<parameters.python_versioner_version>> --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
+
+  - run:
+      name: Increment version
+      command: |
+        . venv/bin/activate
+        gitlog=$(git log -1 --format=oneline)
+        if [[ "$gitlog" ==  *hotfix*  ]]; then increment_revision;
+        elif [[ "$gitlog" ==  *major*  ]]; then increment_major;
+        else increment_minor; fi
+  - run:
+      name: Tag and Push source to GitHub
+      command: |
+        . venv/bin/activate
+        git tag $(print_version) $CIRCLE_SHA1
+        git push --tags
+        git add .
+        git -c user.name=CircleCi -c user.email=circleci@marlettefunding.com commit -m "Increment version for next release [skip ci]"
+        git push
+  - when:
+      condition: <<parameters.push_gemfury>>
+      steps:
+        - run:
+            name: Upload distribution to Gemfury
+            command: |
+              . venv/bin/activate
+              python setup.py bdist_wheel
+              sh bin/deploy.sh
+
+

@@ -1,0 +1,41 @@
+parameters:
+  install_cython:
+    description: Decide if cython needs to be installed
+    type: boolean
+    default: false
+  push_to_sonar:
+    description: Decide if pytest results should be pushed to sonar
+    type: boolean
+    default: true
+  cython_version:
+    description: Version of cython to install
+    type: string
+    default: 0.28.5
+
+steps:
+  - setup_venv:
+      install_requirements: true
+      install_cython: <<parameters.install_cython>>
+      cython_version: <<parameters.cython_version>>
+  - restore_cache:
+      keys:
+        - python-orb-{{ .Branch }}-{{ .Revision }}
+  - run:
+      name: Run coverage tests with pytest
+      command: |
+        . venv/bin/activate
+        coverage run --source=src -m py.test tests
+  - run:
+      name: Generate coverage report
+      command: |
+        . venv/bin/activate
+        coverage xml -o test-coverage/coverage.xml
+        coverage html -d test-coverage/coverage.html
+  - store_test_results:
+      path: test-coverage
+  - store_artifacts:
+      path: test-coverage
+  - when:
+      condition: <<parameters.push_to_sonar>>
+      steps:
+        - sonarcloud/scan

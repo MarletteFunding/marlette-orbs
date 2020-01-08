@@ -1,6 +1,22 @@
 description: >
   This command will setup virtual env
 
+parameters:
+  install_requirements:
+    description: Decide if requirments are needed
+    type: boolean
+    default: false
+
+  install_cython:
+    description: Decide if cython needs to be installed
+    type: boolean
+    default: false
+
+  cython_version:
+    description: Version of cython to install
+    type: string
+    default: 0.28.5
+
 steps:
   - checkout
   - run:
@@ -10,8 +26,25 @@ steps:
           pip install virtualenv
           virtualenv venv
         fi
+  - when:
+      condition: <<parameters.install_cython>>
+      steps:
+        - run:
+            name: Install cython
+            command: |
+              . venv/bin/activate
+              pip install cython==<<parameters.cython_version>>
+
+  - when:
+      condition: <<parameters.install_requirements>>
+      steps:
+        - run:
+            name: Install circle requirements
+            command: |
+              . venv/bin/activate
+              pip install -r requirements.txt
   - save_cache:
-      key: python-sources-{{ .Branch }}-{{ .Revision }}
+      key: python-orb-{{ .Branch }}-{{ .Revision }}
       paths:
         - .
         - ~/.ssh

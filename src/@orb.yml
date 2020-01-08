@@ -2,3 +2,6 @@ version: 2.1
 
 description: >
   marlette-orbs
+
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.1
