@@ -68,7 +68,7 @@ workflows:
      # patch, minor, or major publishing
      - orb-tools/dev-promote-prod:
          name: dev-promote-patch
-         orb-name: circleci/orb-tools
+         orb-name: marlette-funding/marlette-orbs
          cleanup-tags: true
          filters:
            branches:
@@ -79,7 +79,7 @@ workflows:
      - orb-tools/dev-promote-prod:
          name: dev-promote-minor
          release: minor
-         orb-name: circleci/orb-tools
+         orb-name: marlette-funding/marlette-orbs
          cleanup-tags: true
          filters:
            branches:
@@ -90,7 +90,7 @@ workflows:
      - orb-tools/dev-promote-prod:
          name: dev-promote-major
          release: major
-         orb-name: circleci/orb-tools
+         orb-name: marlette-funding/marlette-orbs
          cleanup-tags: true
          filters:
            branches:
