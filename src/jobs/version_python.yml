@@ -38,7 +38,7 @@ steps:
             name: Install remote python versioner
             command: |
               . venv/bin/activate
-              pip install python-versioner=<<parameters.python_versioner_version>> --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
+              pip install python-versioner==<<parameters.python_versioner_version>> --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
 
   - run:
       name: Increment version
