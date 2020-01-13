@@ -11,6 +11,10 @@ parameters:
     description: Version of cython to install
     type: string
     default: 0.28.5
+  source_dir:
+    description: root directory of src code
+    type: string
+    default: src
 
 steps:
   - setup_venv:
@@ -24,7 +28,7 @@ steps:
       name: Run coverage tests with pytest
       command: |
         . venv/bin/activate
-        coverage run --source=src -m py.test tests
+        coverage run --source=<<parameters.source_dir>> -m py.test tests
   - run:
       name: Generate coverage report
       command: |
