@@ -26,7 +26,7 @@ steps:
       install_requirements: false
   - restore_cache:
       keys:
-        - python-orb-{{ .Branch }}-{{ .Revision }}
+        - python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
   - when:
       condition: <<parameters.from_local>>
       steps:

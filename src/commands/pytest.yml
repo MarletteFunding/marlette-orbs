@@ -15,15 +15,20 @@ parameters:
     description: root directory of src code
     type: string
     default: src
+  install_requirements_from_setup:
+    description: If true use setup.py to install requirements
+    type: boolean
+    default: false
 
 steps:
   - setup_venv:
       install_requirements: true
       install_cython: <<parameters.install_cython>>
       cython_version: <<parameters.cython_version>>
+      install_requirements_from_setup: <<parameters.install_requirements_from_setup>>
   - restore_cache:
       keys:
-        - python-orb-{{ .Branch }}-{{ .Revision }}
+        - python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
   - run:
       name: Run coverage tests with pytest
       command: |

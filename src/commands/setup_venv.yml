@@ -17,8 +17,16 @@ parameters:
     type: string
     default: 0.28.5
 
+  install_requirements_from_setup:
+    description: If true use setup.py to install requirements
+    type: boolean
+    default: false
+
 steps:
   - checkout
+  - restore_cache:
+      keys:
+        - python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
   - run:
       name: Install and activate virtual environment
       command: |
@@ -38,13 +46,25 @@ steps:
   - when:
       condition: <<parameters.install_requirements>>
       steps:
-        - run:
-            name: Install circle requirements
-            command: |
-              . venv/bin/activate
-              pip install -r requirements.txt
+        - when:
+            condition:  <<parameters.install_requirements_from_setup>>
+            steps:
+              - run:
+                  name: Install circle requirements from setup.py
+                  command: |
+                    . venv/bin/activate
+                    pip install -e .[test]
+
+        - unless:
+            condition:  <<parameters.install_requirements_from_setup>>
+            steps:
+              - run:
+                  name: Install circle requirements
+                  command: |
+                    . venv/bin/activate
+                    pip install -r requirements.txt
   - save_cache:
-      key: python-orb-{{ .Branch }}-{{ .Revision }}
+      key: python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
       paths:
         - .
         - ~/.ssh
