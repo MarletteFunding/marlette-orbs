@@ -1,32 +1,41 @@
+description: >
+  This job will install python_versioner, increment the version based on last commit message,
+  push updated VERSION file back to github, and if applicable push to gemfury.
+
 executor: python
 parameters:
   push_gemfury:
-    description: Decide whether to push to gemfury or not
+    description: Decide whether to push repo to gemfury or not
     type: boolean
     default: false
+
   from_local:
-    description: Decide whether install python versioner from local or gemfury
+    description: Decide whether install python versioner from local or gemfury (If true python versioner code must be part of code base)
     type: boolean
     default: false
+
   wd:
     description: working directory
     type: string
     default: ~/circleci/workspace
+
   python_versioner_version:
     description: version of python versioner
     type: string
     default: 0.12.0
+
   project_name:
     description: project name used for finding python wheel
     type: string
     default: DEFAULT PROJECT NAME
+
 working_directory: <<parameters.wd>>
 steps:
   - setup_venv:
       install_requirements: false
   - restore_cache:
       keys:
-        - python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
+        - python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
   - when:
       condition: <<parameters.from_local>>
       steps:
@@ -81,5 +90,3 @@ steps:
               else
                   echo "Wheel archive wasn't found."
               fi
-
-

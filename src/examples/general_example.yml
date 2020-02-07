@@ -1,0 +1,35 @@
+description: >
+  Sample implementation of marlette-orbs
+usage:
+  version: 2.1
+  orbs:
+    marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+
+  defaults: &defaults
+    working_directory: ~/project-integration
+    executor:
+      name: marlette-orbs/python
+      tag: 3.7.6
+
+  jobs:
+    pytest:
+      <<: *defaults
+      steps:
+        - marlette-orbs/pytest
+    setup_venv:
+      <<: *defaults
+      steps:
+        - marlette-orbs/setup_venv
+
+  workflows:
+    version: 2.1
+    build_and_test:
+      jobs:
+        - pytest
+        - marlette-orbs/version_python:
+            push_gemfury: true
+            requires:
+              - pytest
+            filters:
+              branches:
+                only: master

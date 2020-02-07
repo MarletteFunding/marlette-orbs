@@ -8,7 +8,7 @@ parameters:
     default: false
 
   install_cython:
-    description: Decide if cython needs to be installed
+    description: Decide if cython needs to be installed (Only mark as true if a dependency needs this library)
     type: boolean
     default: false
 
@@ -18,7 +18,7 @@ parameters:
     default: 0.28.5
 
   install_requirements_from_setup:
-    description: If true use setup.py to install requirements
+    description: If true use setup.py to install requirements (if false requirements.txt is used instead)
     type: boolean
     default: false
 
@@ -26,7 +26,7 @@ steps:
   - checkout
   - restore_cache:
       keys:
-        - python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
+        - python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
   - run:
       name: Install and activate virtual environment
       command: |
@@ -47,7 +47,7 @@ steps:
       condition: <<parameters.install_requirements>>
       steps:
         - when:
-            condition:  <<parameters.install_requirements_from_setup>>
+            condition: <<parameters.install_requirements_from_setup>>
             steps:
               - run:
                   name: Install circle requirements from setup.py
@@ -56,7 +56,7 @@ steps:
                     pip install -e .[test]
 
         - unless:
-            condition:  <<parameters.install_requirements_from_setup>>
+            condition: <<parameters.install_requirements_from_setup>>
             steps:
               - run:
                   name: Install circle requirements
@@ -64,7 +64,7 @@ steps:
                     . venv/bin/activate
                     pip install -r requirements.txt
   - save_cache:
-      key: python-orb-{{ .Environment.CIRCLE_PR_REPONAME }}-{{  .Branch }}-{{ checksum "requirements.txt" }}
+      key: python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
       paths:
         - .
         - ~/.ssh

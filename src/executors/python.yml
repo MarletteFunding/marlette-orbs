@@ -1,6 +1,6 @@
 # How to author Executors: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
 description: >
-  This is a python executor
+  This is a python 3 executor
 working_directory: ~/circleci/workspace
 docker:
   - image: 'circleci/python:<<parameters.tag>>'
