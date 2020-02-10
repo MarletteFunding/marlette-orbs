@@ -71,23 +71,20 @@ steps:
   - when:
       condition: <<parameters.increment_revision>>
       name: increment revision
-      steps:
-        - run:
-          command: |
-            . venv/bin/activate
-            increment_revision
+      run:
+        command: |
+          . venv/bin/activate
+          increment_revision
   - when:
       condition: <<parameters.increment_minor>>
       name: increment minor
-      steps:
-        - run:
-          command: |
-            . venv/bin/activate
-            increment_minor
+      run:
+        command: |
+          . venv/bin/activate
+          increment_minor
   - when:
       condition: <<parameters.increment_major>>
-      steps:
-        - run:
+      run:
           command: |
             . venv/bin/activate
             increment_major
