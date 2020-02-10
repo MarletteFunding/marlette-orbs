@@ -3,7 +3,7 @@ description: >
 usage:
   version: 2.1
   orbs:
-    marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+    marlette-orbs: marlette-funding/marlette-orbs@1.0.6
 
   defaults: &defaults
     working_directory: ~/project-integration
@@ -26,10 +26,25 @@ usage:
     build_and_test:
       jobs:
         - pytest
+    increment_version:
+      jobs:
         - marlette-orbs/version_python:
-            push_gemfury: true
-            requires:
-              - pytest
-            filters:
-              branches:
-                only: master
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
+            increment_revision: true
+        - marlette-orbs/version_python:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+            increment_revision: false
+            increment_minor: true
+        - marlette-orbs/version_python:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/
+            increment_revision: false
+            increment_major: true

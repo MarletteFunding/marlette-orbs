@@ -29,6 +29,21 @@ parameters:
     type: string
     default: DEFAULT PROJECT NAME
 
+  increment_revision:
+    description: If true revision number will be incremented
+    type: boolean
+    default: true
+
+  increment_minor:
+    description: If true minor version will be updated
+    type: boolean
+    default: false
+
+  increment_major:
+    description: If true major version will be updated
+    type: boolean
+    default: false
+
 working_directory: <<parameters.wd>>
 steps:
   - setup_venv:
@@ -53,14 +68,29 @@ steps:
               . venv/bin/activate
               pip install python-versioner==<<parameters.python_versioner_version>> --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
 
-  - run:
-      name: Increment version
-      command: |
-        . venv/bin/activate
-        gitlog=$(git log -1 --format=oneline)
-        if [[ "$gitlog" ==  *hotfix*  ]]; then increment_revision;
-        elif [[ "$gitlog" ==  *major*  ]]; then increment_major;
-        else increment_minor; fi
+  - when:
+      condition: <<parameters.increment_revision>>
+      name: increment revision
+          steps:
+            - run:
+              command: |
+                . venv/bin/activate
+                increment_revision
+  - when:
+      condition: <<parameters.increment_minor>>
+      name: increment minor
+        steps:
+            - run:
+              command: |
+                . venv/bin/activate
+                increment_minor
+  - when:
+      condition: <<parameters.increment_major>>
+        steps:
+            - run:
+              command: |
+                . venv/bin/activate
+                increment_major
   - run:
       name: Tag and Push source to GitHub
       command: |

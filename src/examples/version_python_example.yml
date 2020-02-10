@@ -10,10 +10,34 @@ usage:
     build_and_test:
       jobs:
         - marlette-orbs/version_python:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
             push_gemfury: true
             from_local: false
             python_versioner_version: 0.12.0
             wd: ~/circleci/workspace
-            filters:
-              branches:
-                only: master
+            increment_revision: true
+        - marlette-orbs/version_python:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+            push_gemfury: true
+            from_local: false
+            python_versioner_version: 0.12.0
+            wd: ~/circleci/workspace
+            increment_revision: false
+            increment_minor: true
+        - marlette-orbs/version_python:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/
+            push_gemfury: true
+            from_local: false
+            python_versioner_version: 0.12.0
+            wd: ~/circleci/workspace
+            increment_revision: false
+            increment_major: true
