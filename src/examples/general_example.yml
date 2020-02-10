@@ -32,6 +32,8 @@ usage:
               branches:
                 only: master
             push_gemfury: true
+            increment_revision: true
+            increment_minor: false
             requires:
               - pytest
 

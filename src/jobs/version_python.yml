@@ -32,12 +32,12 @@ parameters:
   increment_revision:
     description: If true revision number will be incremented
     type: boolean
-    default: true
+    default: false
 
   increment_minor:
     description: If true minor version will be updated
     type: boolean
-    default: false
+    default: true
 
   increment_major:
     description: If true major version will be updated
