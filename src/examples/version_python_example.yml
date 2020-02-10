@@ -19,6 +19,7 @@ usage:
             python_versioner_version: 0.12.0
             wd: ~/circleci/workspace
             increment_revision: true
+            increment_minor: false
         - marlette-orbs/version_python:
             branches:
               ignore: /.*/
@@ -28,7 +29,6 @@ usage:
             from_local: false
             python_versioner_version: 0.12.0
             wd: ~/circleci/workspace
-            increment_revision: false
             increment_minor: true
         - marlette-orbs/version_python:
             branches:
@@ -39,5 +39,5 @@ usage:
             from_local: false
             python_versioner_version: 0.12.0
             wd: ~/circleci/workspace
-            increment_revision: false
+            increment_minor: false
             increment_major: true

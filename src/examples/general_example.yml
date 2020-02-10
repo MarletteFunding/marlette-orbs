@@ -46,6 +46,7 @@ usage:
             tags:
               only: /master-patch.*/
             increment_revision: true
+            increment_minor: false
             push_gemfury: true
 
         - marlette-orbs/version_python:
@@ -53,7 +54,6 @@ usage:
               ignore: /.*/
             tags:
               only: /master-minor.*/
-            increment_revision: false
             increment_minor: true
             push_gemfury: true
 
@@ -62,5 +62,5 @@ usage:
               ignore: /.*/
             tags:
               only: /master-major.*/
-            increment_revision: false
+            increment_minor: false
             increment_major: true
