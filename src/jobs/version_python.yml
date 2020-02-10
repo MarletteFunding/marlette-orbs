@@ -71,26 +71,26 @@ steps:
   - when:
       condition: <<parameters.increment_revision>>
       name: increment revision
-          steps:
-            - run:
-              command: |
-                . venv/bin/activate
-                increment_revision
+      steps:
+        - run:
+          command: |
+            . venv/bin/activate
+            increment_revision
   - when:
       condition: <<parameters.increment_minor>>
       name: increment minor
-        steps:
-            - run:
-              command: |
-                . venv/bin/activate
-                increment_minor
+      steps:
+        - run:
+          command: |
+            . venv/bin/activate
+            increment_minor
   - when:
       condition: <<parameters.increment_major>>
-        steps:
-            - run:
-              command: |
-                . venv/bin/activate
-                increment_major
+      steps:
+        - run:
+          command: |
+            . venv/bin/activate
+            increment_major
   - run:
       name: Tag and Push source to GitHub
       command: |
