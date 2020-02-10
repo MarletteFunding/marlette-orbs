@@ -26,6 +26,16 @@ usage:
     build_and_test:
       jobs:
         - pytest
+        # This will increment the version when a commit is made to master
+        - marlette-orbs/version_python:
+            filters:
+              branches:
+                only: master
+            push_gemfury: true
+            requires:
+              - pytest
+
+    # This workflow is only triggered based on tags
     increment_version:
       jobs:
         - marlette-orbs/version_python:
@@ -34,6 +44,8 @@ usage:
             tags:
               only: /master-patch.*/
             increment_revision: true
+            push_gemfury: true
+
         - marlette-orbs/version_python:
             branches:
               ignore: /.*/
@@ -41,6 +53,8 @@ usage:
               only: /master-minor.*/
             increment_revision: false
             increment_minor: true
+            push_gemfury: true
+
         - marlette-orbs/version_python:
             branches:
               ignore: /.*/
