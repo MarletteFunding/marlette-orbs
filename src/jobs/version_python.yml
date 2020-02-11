@@ -33,9 +33,6 @@ working_directory: <<parameters.wd>>
 steps:
   - setup_venv:
       install_requirements: false
-  - restore_cache:
-      keys:
-        - python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
   - when:
       condition: <<parameters.from_local>>
       steps:

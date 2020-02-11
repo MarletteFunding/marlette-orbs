@@ -24,9 +24,6 @@ parameters:
 
 steps:
   - checkout
-  - restore_cache:
-      keys:
-        - python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
   - run:
       name: Install and activate virtual environment
       command: |
@@ -63,8 +60,3 @@ steps:
                   command: |
                     . venv/bin/activate
                     pip install -r requirements.txt
-  - save_cache:
-      key: python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
-      paths:
-        - .
-        - ~/.ssh

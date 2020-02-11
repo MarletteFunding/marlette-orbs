@@ -38,9 +38,6 @@ steps:
       install_cython: <<parameters.install_cython>>
       cython_version: <<parameters.cython_version>>
       install_requirements_from_setup: <<parameters.install_requirements_from_setup>>
-  - restore_cache:
-      keys:
-        - python-orb-{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_PROJECT_REPONAME }}-{{ checksum "requirements.txt" }}
   - run:
       name: Run coverage tests with pytest
       command: |
