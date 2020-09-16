@@ -31,7 +31,7 @@ parameters:
 
   executor:
     description: executor to be used
-    type: string
+    type: executor
     default: python
 
 executor: <<parameters.executor>>
