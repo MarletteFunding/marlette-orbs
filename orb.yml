@@ -1,0 +1,357 @@
+commands:
+  pytest:
+    description: |
+      This command sets up the venv, runs pytests with coverage, and if applicable uploads results to sonar
+    parameters:
+      cython_version:
+        default: 0.28.5
+        description: Version of cython to install
+        type: string
+      install_cython:
+        default: false
+        description: Decide if cython needs to be installed (Only mark as true if
+          a dependency needs this library)
+        type: boolean
+      install_requirements_from_setup:
+        default: false
+        description: If true use setup.py to install requirements (if false requirements.txt
+          is used instead)
+        type: boolean
+      push_to_sonar:
+        default: true
+        description: Decide if pytest results should be pushed to sonar (To use this
+          option ensure that a sonar-project.properties file is in the root directory).
+        type: boolean
+      source_dir:
+        default: src
+        description: root directory of source code
+        type: string
+      test_dir:
+        default: tests
+        description: root directory of tests
+        type: string
+    steps:
+    - setup_venv:
+        cython_version: <<parameters.cython_version>>
+        install_cython: <<parameters.install_cython>>
+        install_requirements: true
+        install_requirements_from_setup: <<parameters.install_requirements_from_setup>>
+    - run:
+        command: |
+          . venv/bin/activate
+          coverage run --source=<<parameters.source_dir>> -m py.test <<parameters.test_dir>>
+        name: Run coverage tests with pytest
+    - run:
+        command: |
+          . venv/bin/activate
+          coverage xml -o test-coverage/coverage.xml
+          coverage html -d test-coverage/coverage.html
+        name: Generate coverage report
+    - store_test_results:
+        path: test-coverage
+    - store_artifacts:
+        path: test-coverage
+    - when:
+        condition: <<parameters.push_to_sonar>>
+        steps:
+        - sonarcloud/scan
+  setup_venv:
+    description: |
+      This command will setup virtual env
+    parameters:
+      cython_version:
+        default: 0.28.5
+        description: Version of cython to install
+        type: string
+      install_cython:
+        default: false
+        description: Decide if cython needs to be installed (Only mark as true if
+          a dependency needs this library)
+        type: boolean
+      install_requirements:
+        default: false
+        description: Decide if requirments are needed
+        type: boolean
+      install_requirements_from_setup:
+        default: false
+        description: If true use setup.py to install requirements (if false requirements.txt
+          is used instead)
+        type: boolean
+    steps:
+    - checkout
+    - run:
+        command: |
+          if [ ! -d "venv" ]; then
+            pip install virtualenv
+            virtualenv venv
+          fi
+        name: Install and activate virtual environment
+    - when:
+        condition: <<parameters.install_cython>>
+        steps:
+        - run:
+            command: |
+              . venv/bin/activate
+              pip install cython==<<parameters.cython_version>>
+            name: Install cython
+    - when:
+        condition: <<parameters.install_requirements>>
+        steps:
+        - when:
+            condition: <<parameters.install_requirements_from_setup>>
+            steps:
+            - run:
+                command: |
+                  . venv/bin/activate
+                  pip install -e .[test]
+                name: Install circle requirements from setup.py
+        - unless:
+            condition: <<parameters.install_requirements_from_setup>>
+            steps:
+            - run:
+                command: |
+                  . venv/bin/activate
+                  pip install -r requirements.txt
+                name: Install circle requirements
+description: |
+  marlette-orbs
+examples:
+  executor_example:
+    description: |
+      Sample implementation of python 3 executor
+    usage:
+      defaults:
+        executor:
+          name: marlette-orbs/python
+          tag: 3.7.6
+        working_directory: ~/project-integration
+      orbs:
+        marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+      version: 2.1
+  general_example:
+    description: |
+      Sample implementation of marlette-orbs
+    usage:
+      defaults:
+        executor:
+          name: marlette-orbs/python
+          tag: 3.7.6
+        working_directory: ~/project-integration
+      jobs:
+        pytest:
+          executor:
+            name: marlette-orbs/python
+            tag: 3.7.6
+          steps:
+          - marlette-orbs/pytest
+          working_directory: ~/project-integration
+        setup_venv:
+          executor:
+            name: marlette-orbs/python
+            tag: 3.7.6
+          steps:
+          - marlette-orbs/setup_venv
+          working_directory: ~/project-integration
+      orbs:
+        marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+      version: 2.1
+      workflows:
+        build_and_test:
+          jobs:
+          - pytest
+          - marlette-orbs/version_python:
+              filters:
+                branches:
+                  only: master
+              push_gemfury: true
+              requires:
+              - pytest
+        version: 2.1
+  pytest_example:
+    description: |
+      Sample implementation of pytest command
+    usage:
+      defaults:
+        executor: marlette-orbs/python
+        working_directory: ~/project-integration
+      jobs:
+        pytest:
+          executor: marlette-orbs/python
+          steps:
+          - marlette-orbs/pytest:
+              cython_version: 0.28.5
+              install_cython: false
+              install_requirements_from_setup: false
+              push_to_sonar: true
+              source_dir: src
+              test_dir: tests
+          working_directory: ~/project-integration
+      orbs:
+        marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+      version: 2.1
+      workflows:
+        build_and_test:
+          jobs:
+          - pytest:
+              filters:
+                branches:
+                  only: master
+              requires:
+              - pytest
+        version: 2.1
+  setup_venv_example:
+    description: |
+      Sample implementation setup_venv command
+    usage:
+      defaults:
+        executor: marlette-orbs/python
+        working_directory: ~/project-integration
+      jobs:
+        setup_venv:
+          executor: marlette-orbs/python
+          steps:
+          - marlette-orbs/setup_venv:
+              cython_version: 0.28.5
+              install_requirements: false
+              install_requirements_from_setup: false
+          working_directory: ~/project-integration
+      orbs:
+        marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+      version: 2.1
+      workflows:
+        build_and_test:
+          jobs:
+          - setup_venv
+        version: 2.1
+  version_python_example:
+    description: |
+      Sample implementation of marlette-orbs
+    usage:
+      orbs:
+        marlette-orbs: marlette-funding/marlette-orbs@1.0.5
+      version: 2.1
+      workflows:
+        build_and_test:
+          jobs:
+          - marlette-orbs/version_python:
+              filters:
+                branches:
+                  only: master
+              from_local: false
+              push_gemfury: true
+              python_versioner_version: 0.12.0
+              wd: ~/circleci/workspace
+        version: 2.1
+executors:
+  python:
+    description: |
+      This is a python 3 executor
+    docker:
+    - image: circleci/python:<<parameters.tag>>
+    parameters:
+      tag:
+        default: 3.7.0
+        description: |
+          Pick a specific python version
+        type: string
+    working_directory: ~/circleci/workspace
+  python2:
+    description: |
+      This is a python 2 executor
+    docker:
+    - image: circleci/python:<<parameters.tag>>
+    parameters:
+      tag:
+        default: 2.7.13
+        description: |
+          Pick a specific python version
+        type: string
+    working_directory: ~/circleci/workspace
+jobs:
+  version_python:
+    description: |
+      This job will install python_versioner, increment the version based on last commit message, push updated VERSION file back to github, and if applicable push to gemfury.
+    executor: python
+    parameters:
+      from_local:
+        default: false
+        description: Decide whether install python versioner from local or gemfury
+          (If true python versioner code must be part of code base)
+        type: boolean
+      project_name:
+        default: DEFAULT PROJECT NAME
+        description: project name used for finding python wheel
+        type: string
+      push_gemfury:
+        default: false
+        description: Decide whether to push repo to gemfury or not
+        type: boolean
+      python_versioner_version:
+        default: 0.12.0
+        description: version of python versioner
+        type: string
+      wd:
+        default: ~/circleci/workspace
+        description: working directory
+        type: string
+    steps:
+    - setup_venv:
+        install_requirements: false
+    - when:
+        condition: <<parameters.from_local>>
+        steps:
+        - run:
+            command: |
+              . venv/bin/activate
+              pip install -e .
+            name: Install local python versioner
+    - unless:
+        condition: <<parameters.from_local>>
+        steps:
+        - run:
+            command: |
+              . venv/bin/activate
+              pip install python-versioner==<<parameters.python_versioner_version>> --extra-index-url https://pypi.fury.io/TAeHp1T6JhyNRkPiK3xt/marlettefunding/
+            name: Install remote python versioner
+    - run:
+        command: |
+          . venv/bin/activate
+          gitlog=$(git log -1 --format=oneline)
+          if [[ "$gitlog" ==  *hotfix*  ]]; then increment_revision;
+          elif [[ "$gitlog" ==  *major*  ]]; then increment_major;
+          else increment_minor; fi
+        name: Increment version
+    - run:
+        command: |
+          . venv/bin/activate
+          git tag $(print_version) $CIRCLE_SHA1
+          git push --tags
+          git add .
+          git -c user.name=CircleCi -c user.email=circleci@marlettefunding.com commit -m "Increment version for next release [skip ci]"
+          git push
+        name: Tag and Push source to GitHub
+    - when:
+        condition: <<parameters.push_gemfury>>
+        steps:
+        - run:
+            command: |
+              . venv/bin/activate
+              python setup.py bdist_wheel
+              sudo apt-get install curl -y
+              cd dist
+              wheel_archive=$(find -name "<<parameters.project_name>>-*.whl" -print | head -n 1)
+              wheel_archive_name=$(echo $wheel_archive | sed "s/.*\///")
+
+              if [ -n "$wheel_archive_name" ];
+              then
+                  # Upload new wheel archive to Gemfury
+                  curl -F package=@$wheel_archive_name https://TAeHp1T6JhyNRkPiK3xt@push.fury.io/marlettefunding/
+              else
+                  echo "Wheel archive wasn't found."
+              fi
+            name: Upload distribution to Gemfury
+    working_directory: <<parameters.wd>>
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+version: 2.1
+
