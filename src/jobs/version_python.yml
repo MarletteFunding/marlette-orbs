@@ -2,6 +2,7 @@ description: >
   This job will install python_versioner, increment the version based on last commit message,
   push updated VERSION file back to github, and if applicable push to gemfury.
 
+
 parameters:
   push_gemfury:
     description: Decide whether to push repo to gemfury or not
@@ -24,9 +25,11 @@ parameters:
     default: 0.12.0
 
   project_name:
-    description: project name used for finding python wheel
+    description: executor to be used
     type: string
-    default: DEFAULT PROJECT NAME
+    default: python
+
+executor: <<parameters.python>>
 
 working_directory: <<parameters.wd>>
 steps:
