@@ -34,7 +34,7 @@ parameters:
     type: string
     default: python
 
-executor: <<parameters.python>>
+executor: <<parameters.executor>>
 
 working_directory: <<parameters.wd>>
 steps:
