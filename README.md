@@ -24,3 +24,9 @@ Documentation: https://circleci.com/orbs/registry/orb/marlette-funding/marlette-
 
 #### Other helpful circleci commands
 > `circleci orb validate src/@orb.yml` will make sure that the config file is valid
+
+### What to do if the @dev:alpha is expired
+> The easiest thing to do is ssh into circle,
+>
+>`cd project/workspace`
+>`circleci orb publish orb.yml "marlette-funding/marlette-orbs@dev:alpha" --token $CIRCLE_TOKEN `
